@@ -25,6 +25,8 @@ const int worldHeightMid {32};
 const int worldMaxClimb {5};
 const double worldAveClimb {1.2};
 
+const int rendRes[2] {149, 11};//both must be odd
+
 struct voxData{
     int voxID {-1};
     bool isSolid;
@@ -71,10 +73,16 @@ int main () {
     voxBorder.notMinable = true;
     
     #pragma endregion
+    
+    for (int y = 0; y < worldBoundY; y++) {
+        for (int x = 0; x < worldBoundX; x++) {
+            worldVoxData[x][y] = 0;
+        }
+    }
 
     voxData voxel [5] {voxVoid, voxDirt, voxGrass, voxStone, voxBorder};
     double perlinWorldWeight [worldBoundY] {};
-    int playerPos [2] {30, 30};//current numbers are placeholders
+    int playerPos [2] {95, 63};//current numbers are placeholders
 
     for (int i = 0; i < worldHeightMin; i++) {
         perlinWorldWeight[i] = -1;
@@ -97,23 +105,46 @@ double perlinWeightGen () {
 }
 
 void worldTerminalRender (int playerPos[], voxData voxel[]) {
-    for (int y = playerPos[1]+12; y > 0; y--){
-        for (int x = playerPos[0]-12; x > 13; x++) {
-            std::cout << worldVoxData[x][y];
+    int resX = ceil(rendRes[0]/2);
+    int resY = ceil(rendRes[1]/2);
+
+    for (int y = playerPos[1]+resY; y >= playerPos[1]+1; y--){
+        for (int x = playerPos[0]-resX; x < playerPos[0]+resX; x++) {
+            if ((x >= 0 && y >= 0) && (x < worldBoundX && y < worldBoundY)) {
+                std::cout <<  voxel[worldVoxData[x][y]].renderChar;
+            }
+            else {
+                std::cout << "X";
+            }
         }
         std::cout << '\n';
-    }
-    for (int x = playerPos[0]-12; x < 0; x++) {
-        std::cout << worldVoxData[x][playerPos[1]];
+    }  
+    for (int x = playerPos[0]-resX; x < playerPos[0]; x++) {
+        if (x >=0 && x < worldBoundX) {
+            std::cout << voxel[worldVoxData[x][playerPos[1]]].renderChar;
+        }
+        else {
+            std::cout << "X";
+        }
     }
     std::cout << "P";
-    for (int x = playerPos[0]+1; x < 13; x++) {
-        std::cout << worldVoxData[x][playerPos[1]];
+    for (int x = playerPos[0]+1; x < playerPos[0]+resX; x++) {
+        if (x >= 0 && x < worldBoundX) {
+            std::cout << voxel[worldVoxData[x][playerPos[1]]].renderChar;
+        }
+        else {
+            std::cout << "X";
+        }
     }
     std::cout << '\n';
-    for  (int y = playerPos[1]-1; y > -13; y--){
-        for (int x = playerPos[0]-12; x > 13; x++) {
-            std::cout << worldVoxData[x][y];
+    for  (int y = playerPos[1]-1; y >= playerPos[1]-resY; y--){
+        for (int x = playerPos[0]-resX; x < playerPos[0]+resX; x++) {
+            if ((x >= 0 && y >= 0) && ( x < worldBoundX && y < worldBoundY)) {
+                std::cout << voxel[worldVoxData[x][y]].renderChar;
+            }
+            else {
+                std::cout << "X";
+            }
         }  
         std::cout << '\n';
     }
